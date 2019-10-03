@@ -1,2 +1,2 @@
 # TurtleGraphics
-A program that uses threading to draw patterns at the same time at a slow rate. Uploaded are some images it is in the process of drawing. To test it download the jar, run it, and once running hit the 1, 2 or 3 on the keyboard to start some turtles (numpad won't work). Hit delete to clear the screen. Hit escape key to exit the program.
+A program that uses threading, data structures, and programming principles to efficiently draw geometric patterns. Instructions for use appear after running. The user can also create and control over 200 of their own drawing objects. The latest version is turtles.jar. Press or hold 1, 2, or 3. To create your own press space-bar then control using the arrow keys. To quit press escape. To clear the screen press delete.
