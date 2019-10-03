@@ -15,36 +15,70 @@ import javax.swing.JFrame;
 
 public class TurtleWindow extends JFrame {
 	
+	public static TurtleWindow tw = new TurtleWindow();
+	
 	public static void main(String []args) {
-		//initialize the window and start the program
-		TurtleWindow tw = new TurtleWindow();
+		//this doesnt have anything which kinda makes me uncomfortable
 	}
 	
 	//we are going to get the size of the screen and store it here 
 	final Dimension SCREEN_SIZE = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
+	//whether or not im testing
+	boolean testing = false;
+	//used for testing so the whole screen isnt covered
+	Dimension testingSize = new Dimension();
 	//this is the window creation and setting the default properties
 	public TurtleWindow() {
-		//this basically just sets the window to be full screen
-		this.setSize(SCREEN_SIZE);
+
+		testingSize.width = SCREEN_SIZE.width/2;
+		testingSize.height = SCREEN_SIZE.height/2;
+		//so setting window size and whether its maximized and stuff
+		//if testing then wont be max size and fullscreen
+		//it will most likely cause errors if the order of these is changed so dont change
+		if(testing) {
+			this.setSize(testingSize);
+		} else {
+			this.setSize(SCREEN_SIZE);
+		}
 		this.setUndecorated(true);
 		this.setVisible(true);
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		if(testing) {
+			
+		} else {
+			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		}
 		this.setResizable(false);
 		//whenever a key is pressed do stuff in this class
 		this.addKeyListener(new KeyListener());
 		//handles mouse input and what to do
 		this.addMouseListener(new MouseListener());
 		this.addMouseMotionListener(new MouseListener());
+		
+		//creating mouse turtle and making it work
+		turtles.add(mouseTurtle);
+		turtleThreads.add(mouseThread);
+		mouseThread.start();
+		
 	}
+	
+	//the mouse following turtle
+	Turtle mouseTurtle = new Turtle(-1);
+	Thread mouseThread = new Thread(mouseTurtle);
 	
 	//list of turtles
 	ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 	//all the turtles threads in a list so that we can stop all of them
 	//when delete all turtles or something is called
 	ArrayList<Thread> turtleThreads = new ArrayList<Thread>();
+	//we also need a seperate turtle list for the key events so
+	//when a key is pressed it doesn't go through every turtle
+	//just the controllable ones
+	ArrayList<Turtle> controlTurtles = new ArrayList<Turtle>();
 	public void makeTurtle(int id) {
 		Turtle newTurt = new Turtle(id);
 		turtles.add(newTurt);
+		if(id == 0)
+			controlTurtles.add(newTurt);
 		Thread newThread = new Thread(newTurt);
 		turtleThreads.add(newThread);
 		newThread.start();
@@ -66,7 +100,6 @@ public class TurtleWindow extends JFrame {
 		//call each turtles little draw thing
 		for(Turtle t: turtles)
 			t.paintTurtle(g);
-		mouseTurtle.paintTurtle(g);
 		//call paint again bc we dont wanna just draw one thing
 		//and give up
 		repaint();
@@ -76,6 +109,10 @@ public class TurtleWindow extends JFrame {
 	final int FORWARD = 1, RIGHT = 2, LEFT = 3, COLOR = 4;
 	
 	public class KeyListener extends KeyAdapter {
+		//ok so, you can only switch by likes ints and chars so i figured out the keycode for everything
+		//I now realize that I could use a map so I might try that
+		
+		
 		//this is called whenever a key is pressed
 		public void keyPressed(KeyEvent e) {
 			switch(e.getKeyCode()) {
@@ -88,6 +125,7 @@ public class TurtleWindow extends JFrame {
 				for(Turtle t: turtles)
 					t.run = false;
 				turtles.clear();
+				controlTurtles.clear();
 				changeBG = true;
 				break;
 			//if escape is pressed immediately terminate the program
@@ -106,24 +144,129 @@ public class TurtleWindow extends JFrame {
 			case 51:
 				makeTurtle(3);
 				break;
+			//if four is passed
+			case 52:
+				makeTurtle(4); 
+				break;
+			//if m is pressed get mouseTurtle going
+			case 77:
+				//turtles.add(mouseTurtle);
+				//turtleThreads.add(mouseThread);
+				//mouseThread.start();
+				break;
+			//So lets add some key commands bc thats even cooler
+			//first to make a new controllable turle press space
+			case 32:
+				makeTurtle(0);
+				break;
+			//arrow right
+			case 39:
+				for(Turtle t: controlTurtles)
+					t.setRight(true);
+				break;
+			//arrow left
+			case 37:
+				for(Turtle t: controlTurtles)
+					t.setLeft(true);
+				break;
+			//arrow up
+			case 38:
+				for(Turtle t: controlTurtles)
+					t.setUp(true);
+				break;
+			//arrow down
+			case 40:
+				for(Turtle t: controlTurtles)
+					t.setDown(true);
+				break;
+			//equal sign will do some color changes and minus
+			case 61:
+				for(Turtle t: controlTurtles)
+					t.setColor(50, 10, 50);
+				break;
+			case 189:
+				for(Turtle t: controlTurtles)
+					t.setColor(-5, -5, -5);
+				break;
+			}
+			System.out.print(e);
+		}
+		
+		public void keyReleased(KeyEvent e) {
+			switch(e.getKeyCode()) {
+			//arrow right
+			case 39:
+				for(Turtle t: controlTurtles)
+					t.setRight(false);
+				break;
+			//arrow left
+			case 37:
+				for(Turtle t: controlTurtles)
+					t.setLeft(false);
+				break;
+			//arrow up
+			case 38:
+				for(Turtle t: controlTurtles)
+					t.setUp(false);
+				break;
+			//arrow down
+			case 40:
+				for(Turtle t: controlTurtles)
+					t.setDown(false);
+				break;
 			}
 		}
+		
 	}
 
-	//the mouse following turtle
-	Turtle mouseTurtle = new Turtle(0);
 	boolean first = true;
 	public class MouseListener extends MouseAdapter {
 		//this is when the mouse is moved do a thing
 		public void mouseMoved(MouseEvent m) {
 			//so now if the mouse moved we are gonna follow it because thats cool
 			//using math
+			// TODO 
+			/*
 			int newx = m.getX();
 			int newy = m.getY();
-			//TODO fix this, it no work for some reason
-			double distance = Math.sqrt(((newx-(int)mouseTurtle.x)^(2))+(newy-(int)mouseTurtle.y)^(2));
-			
-			mouseTurtle.addCommand(FORWARD, (int)distance);
+			double turty = mouseTurtle.y;
+			double turtx = mouseTurtle.x;
+			//TODO optimize this mouse follow stuff, its currently awful
+			//so this gets the distance from one point to the next
+			double distance = Math.sqrt((newx-(int)turtx)^(2)+(newy-(int)turty)^(2));
+			//this gets the angle to the next distance
+			if(!Double.isNaN(distance)) {
+				//mouseTurtle.angle = Math.atan((newy-(int)mouseTurtle.y)/(newx-(int)mouseTurtle.x));
+				double angle, ydis, xdis;
+				
+				if(turty > newy) {
+					ydis = turty - newy;
+					if(turtx > newx) {
+						
+					} else if(newx > turtx) {
+						
+					} else {
+						
+					}
+				} else if(newy > turty) {
+					ydis = newy - turty;
+					if(turtx > newx) {
+						
+					} else if(newx > turtx) {
+						
+					} else {
+						
+					}
+				} else {
+					if(turtx > newx) {
+						
+					} else if(newx > turtx) {
+						
+					}
+				}
+				
+				mouseTurtle.addCommand(FORWARD, (int)distance);
+			}*/
 		}
 		//this is when the mouse is pressed do a thing
 		public void mousePressed(MouseEvent m) {

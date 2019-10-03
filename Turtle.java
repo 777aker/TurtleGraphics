@@ -22,6 +22,9 @@ public class Turtle implements Runnable {
 	//so if repeat is called go fill it again by calling this sort of
 	public void repeat() {
 		switch(id) {
+		case 0:
+			tColor = new Color(10, 10, 10);
+			break;
 		case 1:
 			one();
 			break;
@@ -31,17 +34,23 @@ public class Turtle implements Runnable {
 		case 3:
 			three();
 			break;
+		case 4:
+			four();
+			break;
+			default:
+				break;
 		}
 	}
 	
 	//ok we also need the angle it is looking toward
-	double angle;
+	public double angle;
 	//and we need the color the turtle is drawing
 	Color tColor = Color.MAGENTA;
 	//the queue of commands for the turtle to follow
 	Queue<Integer> commandQueue = new LinkedList<>();
 	//how much to do that command (thats good communication skills uhg)
 	Queue<Integer> amountQueue = new LinkedList<>();
+	//TODO use the fram size from tw instead of the screensize
 	//the x and y position of the turtle
 	double x = Toolkit.getDefaultToolkit().getScreenSize().width/2, 
 			y = Toolkit.getDefaultToolkit().getScreenSize().height/2;
@@ -90,6 +99,45 @@ public class Turtle implements Runnable {
 		}
 	}
 	
+	public void controlMove() {
+		if(right) {
+			angle += 1;
+		}
+		if(left) {
+			angle -= 1; 
+		}
+		if(up) {
+			x += Math.cos(Math.toRadians(angle));
+			y += Math.sin(Math.toRadians(angle));
+		}
+		if(down) {
+			x -= Math.cos(Math.toRadians(angle));
+			y -= Math.sin(Math.toRadians(angle));
+		}
+	}
+	
+	//booleans for which keys are currently being held
+	boolean right = false, left = false, up = false, down = false;
+	//setters for which key is currently being held
+	public void setRight(boolean r) {right = r;}
+	public void setLeft(boolean l) {left = l;}
+	public void setUp(boolean u) {up = u;}
+	public void setDown(boolean d) {down = d;}
+	//color variables
+	int red = 10, green = 10, blue = 10;
+	public void setColor(int r, int g, int b) {
+		red += r;
+		green += g;
+		blue += b;
+		if(red > 255)
+			red = 0;
+		if(green > 255)
+			green = 0;
+		if(blue > 255)
+			blue = 0;
+		tColor = new Color(red, green, blue);
+	}
+	
 	//this is how an outside program can add commands to a turtle
 	public void addCommand(int c, int a) {
 		commandQueue.add(c);
@@ -118,7 +166,13 @@ public class Turtle implements Runnable {
 		try {
 			//just do this forever
 			while(run) {
-				move();
+				//if its not a controllable turtle move normally
+				if(id != 0) {
+					move();
+				} else {
+					//this is a special method for moving control turtles
+					controlMove();
+				}
 				//now we tell it to slow down bc we
 				//dont need maximum speed computer can go thats excessive,
 				//and looks ridiculous
@@ -218,4 +272,8 @@ public class Turtle implements Runnable {
 			
 		}
 	
+		public void four() {
+			
+		}
+		
 }
