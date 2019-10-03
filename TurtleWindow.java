@@ -96,6 +96,12 @@ public class TurtleWindow extends JFrame {
 			g.setColor(backgroundColor);
 			g.fillRect(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.height);
 			changeBG = false;
+			g.setColor(Color.white);
+			g.drawString("Press 1, 2, or 3 or hold.", 10, 20);
+			g.drawString("Press spacebar to create a controllable turtle.", 10, 40);
+			g.drawString("Use arrows to control and - = to change color.", 10, 60);
+			g.drawString("Press del to clear screen.", 10, 80);
+			g.drawString("Press escape to quit.", 10, 100);
 		}
 		//call each turtles little draw thing
 		for(Turtle t: turtles)
@@ -189,7 +195,6 @@ public class TurtleWindow extends JFrame {
 					t.setColor(-5, -5, -5);
 				break;
 			}
-			System.out.print(e);
 		}
 		
 		public void keyReleased(KeyEvent e) {
